@@ -1,0 +1,27 @@
+{
+  "variables": {
+    "unique_id": "{{uuid}}"
+  },
+  "builders": [
+    {
+      "type": "amazon-chroot",
+      "mount_path": "/mnt/packer-amazon-chroot-{{user `unique_id`}}",
+      "region": "us-east-1",
+      "ami_name": "packer-chroot-example {{isotime | clean_ami_name}}",
+      "source_ami": "ami-4fffc834",
+      "tags": {
+        "Name": "AMI baked with Packer using amazon-chroot and ansible."
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "extra_arguments": [
+        "--connection=chroot",
+        "--inventory-file=/mnt/packer-amazon-chroot-{{user `unique_id`}},"
+      ],
+      "playbook_file": "ansible.yml"
+    }
+  ]
+}

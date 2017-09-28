@@ -1,0 +1,22 @@
+---
+  # Written in yaml then convert to json for packer. Yaml supports comments which are incredibly valuable.
+  # npm install -g yaml2json
+  # npm install -g json2yaml
+  variables:
+    unique_id: "{{uuid}}"
+  builders:
+    -
+      type: amazon-chroot
+      mount_path: "/mnt/packer-amazon-chroot-{{user `unique_id`}}"
+      region: us-east-1
+      ami_name: packer-chroot-example "{{isotime | clean_ami_name}}" # yaml2json has issues with this line.
+      source_ami: ami-4fffc834
+      tags:
+        Name: AMI baked with Packer using amazon-chroot and ansible.
+  provisioners:
+    -
+      type: "ansible" # ansible runs on the same machine as packer. ansible-local runs on the target machine.
+      extra_arguments:
+      -  "--connection=chroot"
+      - "--inventory-file=/mnt/packer-amazon-chroot-{{user `unique_id`}}," # Remember that trailing comma. It's needed for chroot and always comes back to haunt me.
+      playbook_file: "ansible.yml"

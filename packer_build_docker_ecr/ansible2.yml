@@ -1,0 +1,14 @@
+---
+- name: Example remote playbook - second play
+  hosts: all
+  tasks:
+    - name: Install multiple items
+      yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - httpd
+        - zip
+        - dnsmasq
+        - vim
+        - unzip

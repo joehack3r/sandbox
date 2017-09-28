@@ -1,0 +1,8 @@
+---
+- name: Example remote playbook
+  hosts: all # Ansible 2.4.0 will try to gather facts on 127.0.0.1 which will fail and cause packer to fail.
+  tasks:
+    - name: Install Nginx
+      yum:
+        name: nginx
+        state: latest

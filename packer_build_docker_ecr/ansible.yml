@@ -1,0 +1,8 @@
+---
+- name: Example remote playbook
+  hosts: all
+  tasks:
+    - name: Install Nginx
+      yum:
+        name: nginx
+        state: latest

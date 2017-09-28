@@ -1,0 +1,44 @@
+---
+  # Written in yaml then convert to json for packer. Yaml supports comments which are incredibly valuable.
+  # npm install -g yaml2json
+  # npm install -g json2yaml
+  variables:
+    ansible_host: "default"
+    ansible_connection: "docker"
+  builders:
+    -
+      type: "docker"
+      image: "amazonlinux"
+      commit: "true"
+      # changes:
+      # - USER www-data
+      # - WORKDIR /var/www
+      # - ENV HOSTNAME www.example.com
+      # - VOLUME /test1 /test2
+      # - EXPOSE 80 443
+      # - LABEL version='{{user `version`}}'
+      # - ONBUILD RUN date
+      # # - CMD ["nginx", "-g", "daemon off;"] # yaml2json has issues with this line.
+      # - ENTRYPOINT /bin/bash
+      run_command:
+      - "-d"
+      - "-i"
+      - "-t"
+      - "--name"
+      - "{{user `ansible_host`}}"
+      - "{{.Image}}"
+      - "/bin/bash"
+  provisioners:
+    -
+      type: "ansible" # ansible runs on the same machine as packer. ansible-local runs on the target machine.
+      user: "root"
+      extra_arguments:
+      - "--extra-vars"
+      - "ansible_host={{user `ansible_host`}} ansible_connection={{user `ansible_connection`}}"
+      playbook_file: "ansible.yml"
+  post-processors:
+    -
+      -
+        type: docker-tag
+        repository: 'sandbox'
+        tag: '{{user `version`}}'

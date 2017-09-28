@@ -1,0 +1,42 @@
+{
+  "variables": {
+    "ansible_host": "default",
+    "ansible_connection": "docker"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "amazonlinux",
+      "commit": "true",
+      "run_command": [
+        "-d",
+        "-i",
+        "-t",
+        "--name",
+        "{{user `ansible_host`}}",
+        "{{.Image}}",
+        "/bin/bash"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "user": "root",
+      "extra_arguments": [
+        "--extra-vars",
+        "ansible_host={{user `ansible_host`}} ansible_connection={{user `ansible_connection`}}"
+      ],
+      "playbook_file": "ansible.yml"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "sandbox",
+        "tag": "{{user `version`}}"
+      }
+    ]
+  ]
+}
